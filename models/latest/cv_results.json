@@ -1,0 +1,398 @@
+{
+  "evaluation_protocol": "Leave-One-Region-Out Cross-Validation (LORO-CV)",
+  "timestamp_utc": "2026-08-29T13:43:31.488376+00:00",
+  "total_active_regions_evaluated": 12,
+  "aggregate_summary": {
+    "num_folds": 12,
+    "true_skill_statistic_tss": {
+      "mean": -0.1792,
+      "std": 0.4292
+    },
+    "heidke_skill_score_hss": {
+      "mean": -0.0044,
+      "std": 0.2335
+    },
+    "f1_score": {
+      "mean": 0.0791,
+      "std": 0.2048
+    },
+    "recall_tpr": {
+      "mean": 0.1111,
+      "std": 0.2833
+    },
+    "precision": {
+      "mean": 0.0615,
+      "std": 0.1604
+    },
+    "specificity_tnr": {
+      "mean": 0.7097,
+      "std": 0.2979
+    },
+    "false_alarm_rate_fpr": {
+      "mean": 0.2903,
+      "std": 0.2979
+    },
+    "roc_auc": {
+      "mean": 0.4036,
+      "std": 0.404
+    },
+    "flux_mae": {
+      "mean": 0.2816,
+      "std": 0.2783
+    },
+    "flux_r2": {
+      "mean": -0.1649,
+      "std": 0.0992
+    }
+  },
+  "per_fold_breakdown": {
+    "AR-11158": {
+      "held_out_ar": "AR-11158",
+      "test_sequences": 17,
+      "optimal_threshold": 0.84,
+      "calibrated_temperature": 0.574,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 7,
+        "true_negatives": 6,
+        "false_negatives": 4,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 0.4615,
+        "false_alarm_rate_fpr": 0.5385,
+        "miss_rate_fnr": 1.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": -0.5385,
+        "heidke_skill_score_hss": -0.4275,
+        "decision_threshold_used": 0.84,
+        "roc_auc": 0.0,
+        "pr_auc": 0.1569
+      },
+      "multiclass_macro_f1": 0.1739,
+      "flux_regression": {
+        "log10_mae": 0.782,
+        "log10_rmse": 1.3361,
+        "r2_score": -0.3289
+      }
+    },
+    "AR-12673": {
+      "held_out_ar": "AR-12673",
+      "test_sequences": 17,
+      "optimal_threshold": 0.48,
+      "calibrated_temperature": 1.18,
+      "binary_metrics": {
+        "true_positives": 1,
+        "false_positives": 5,
+        "true_negatives": 9,
+        "false_negatives": 2,
+        "recall_tpr": 0.3333,
+        "precision": 0.1667,
+        "specificity": 0.6429,
+        "false_alarm_rate_fpr": 0.3571,
+        "miss_rate_fnr": 0.6667,
+        "f1_score": 0.2222,
+        "true_skill_statistic_tss": -0.0238,
+        "heidke_skill_score_hss": -0.0171,
+        "decision_threshold_used": 0.48,
+        "roc_auc": 0.5476,
+        "pr_auc": 0.2659
+      },
+      "multiclass_macro_f1": 0.3175,
+      "flux_regression": {
+        "log10_mae": 0.6628,
+        "log10_rmse": 1.2657,
+        "r2_score": -0.1137
+      }
+    },
+    "AR-12887": {
+      "held_out_ar": "AR-12887",
+      "test_sequences": 17,
+      "optimal_threshold": 0.16,
+      "calibrated_temperature": 0.577,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 11,
+        "true_negatives": 4,
+        "false_negatives": 2,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 0.2667,
+        "false_alarm_rate_fpr": 0.7333,
+        "miss_rate_fnr": 1.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": -0.7333,
+        "heidke_skill_score_hss": -0.2486,
+        "decision_threshold_used": 0.16,
+        "roc_auc": 0.0667,
+        "pr_auc": 0.0945
+      },
+      "multiclass_macro_f1": 0.1793,
+      "flux_regression": {
+        "log10_mae": 0.3366,
+        "log10_rmse": 0.7468,
+        "r2_score": 0.0037
+      }
+    },
+    "AR-13000": {
+      "held_out_ar": "AR-13000",
+      "test_sequences": 13,
+      "optimal_threshold": 0.4,
+      "calibrated_temperature": 0.773,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "true_negatives": 13,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "false_alarm_rate_fpr": 0.0,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": 0.0,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.4,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.2262,
+      "flux_regression": {
+        "log10_mae": 0.2845,
+        "log10_rmse": 0.6596,
+        "r2_score": -0.2227
+      }
+    },
+    "AR-13100": {
+      "held_out_ar": "AR-13100",
+      "test_sequences": 57,
+      "optimal_threshold": 0.58,
+      "calibrated_temperature": 1.029,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "true_negatives": 57,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "false_alarm_rate_fpr": 0.0,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": 0.0,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.58,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 1.0,
+      "flux_regression": {
+        "log10_mae": 0.0067,
+        "log10_rmse": 0.0076,
+        "r2_score": "N/A"
+      }
+    },
+    "AR-13200": {
+      "held_out_ar": "AR-13200",
+      "test_sequences": 17,
+      "optimal_threshold": 0.58,
+      "calibrated_temperature": 1.048,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "true_negatives": 17,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "false_alarm_rate_fpr": 0.0,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": 0.0,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.58,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.0556,
+      "flux_regression": {
+        "log10_mae": 0.207,
+        "log10_rmse": 0.5151,
+        "r2_score": -0.2202
+      }
+    },
+    "AR-13300": {
+      "held_out_ar": "AR-13300",
+      "test_sequences": 17,
+      "optimal_threshold": 0.5,
+      "calibrated_temperature": 0.476,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "true_negatives": 17,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "false_alarm_rate_fpr": 0.0,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": 0.0,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.5,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.1053,
+      "flux_regression": {
+        "log10_mae": 0.1403,
+        "log10_rmse": 0.3971,
+        "r2_score": -0.0982
+      }
+    },
+    "AR-13450": {
+      "held_out_ar": "AR-13450",
+      "test_sequences": 37,
+      "optimal_threshold": 0.62,
+      "calibrated_temperature": 1.224,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 27,
+        "true_negatives": 10,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 0.2703,
+        "false_alarm_rate_fpr": 0.7297,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": -0.7297,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.62,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.0,
+      "flux_regression": {
+        "log10_mae": 0.0758,
+        "log10_rmse": 0.076,
+        "r2_score": "N/A"
+      }
+    },
+    "AR-13500": {
+      "held_out_ar": "AR-13500",
+      "test_sequences": 37,
+      "optimal_threshold": 0.56,
+      "calibrated_temperature": 1.052,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 9,
+        "true_negatives": 28,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 0.7568,
+        "false_alarm_rate_fpr": 0.2432,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": -0.2432,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.56,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.0,
+      "flux_regression": {
+        "log10_mae": 0.0853,
+        "log10_rmse": 0.0923,
+        "r2_score": "N/A"
+      }
+    },
+    "AR-13600": {
+      "held_out_ar": "AR-13600",
+      "test_sequences": 17,
+      "optimal_threshold": 0.64,
+      "calibrated_temperature": 2.012,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 0,
+        "true_negatives": 17,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "false_alarm_rate_fpr": 0.0,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": 0.0,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.64,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 1.0,
+      "flux_regression": {
+        "log10_mae": 0.0231,
+        "log10_rmse": 0.0262,
+        "r2_score": "N/A"
+      }
+    },
+    "AR-13664": {
+      "held_out_ar": "AR-13664",
+      "test_sequences": 21,
+      "optimal_threshold": 0.54,
+      "calibrated_temperature": 0.315,
+      "binary_metrics": {
+        "true_positives": 4,
+        "false_positives": 3,
+        "true_negatives": 14,
+        "false_negatives": 0,
+        "recall_tpr": 1.0,
+        "precision": 0.5714,
+        "specificity": 0.8235,
+        "false_alarm_rate_fpr": 0.1765,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.7273,
+        "true_skill_statistic_tss": 0.8235,
+        "heidke_skill_score_hss": 0.64,
+        "decision_threshold_used": 0.54,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0
+      },
+      "multiclass_macro_f1": 0.2292,
+      "flux_regression": {
+        "log10_mae": 0.7478,
+        "log10_rmse": 1.4671,
+        "r2_score": -0.1746
+      }
+    },
+    "AR-13700": {
+      "held_out_ar": "AR-13700",
+      "test_sequences": 17,
+      "optimal_threshold": 0.6,
+      "calibrated_temperature": 1.174,
+      "binary_metrics": {
+        "true_positives": 0,
+        "false_positives": 12,
+        "true_negatives": 5,
+        "false_negatives": 0,
+        "recall_tpr": 0.0,
+        "precision": 0.0,
+        "specificity": 0.2941,
+        "false_alarm_rate_fpr": 0.7059,
+        "miss_rate_fnr": 0.0,
+        "f1_score": 0.0,
+        "true_skill_statistic_tss": -0.7059,
+        "heidke_skill_score_hss": 0.0,
+        "decision_threshold_used": 0.6,
+        "roc_auc": "N/A (Single class present)",
+        "pr_auc": "N/A (Single class present)"
+      },
+      "multiclass_macro_f1": 0.1,
+      "flux_regression": {
+        "log10_mae": 0.0277,
+        "log10_rmse": 0.0349,
+        "r2_score": "N/A"
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+# ☀️ Aditya-L1 Solar Flare Forecasting System Configuration
+# Smart India Hackathon (SIH) 2026
+
+system:
+  project_name: "Aditya-L1 Solar Flare & Space Weather Early Warning System"
+  version: "2.6.0"
+  random_seed: 42
+  device: "cpu"  # "cuda" if GPU is available
+
+data:
+  data_mode: "REAL"  # "SYNTHETIC" or "REAL"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  catalogs_dir: "data/catalogs"
+  demo_dir: "data/demo_scenarios"
+  models_dir: "models"
+  synthetic_dir: "data/full_resolution_synthetic"
+  real_dir: "data/full_resolution_real"
+  
+  # Image Pipeline
+  image_size: [256, 256]
+  full_disk_size: [512, 512]
+  in_channels: 4  # [Ch0: UV/Intensity, Ch1: Spatial Gradient |∇I|, Ch2: Laplacian ∇²I, Ch3: Temporal Emergence ΔIt]
+  sequence_length: 4  # T-3, T-2, T-1, T-0
+  cadence_hours: 3
+
+forecasting:
+  horizon_start_hours: 24
+  horizon_end_hours: 48
+  flare_classes: ["Quiet/B", "C-Class", "M-Class", "X-Class"]
+  major_flare_threshold_class: "M1.0"
+  major_flare_threshold_flux: 1.0e-5  # W/m²
+
+training:
+  batch_size: 4
+  learning_rate: 0.0003
+  num_epochs: 25
+  weight_decay: 0.0001
+  loss_weights:
+    binary_loss: 1.0
+    multiclass_loss: 0.5
+    flux_loss: 0.5
+  
+  # Complete pool of NOAA Active Regions for Leave-One-Region-Out CV
+  all_active_regions: [
+    "AR-13664", "AR-12673", "AR-11158", "AR-12887",
+    "AR-13000", "AR-13200", "AR-13300",
+    "AR-13450", "AR-13500", "AR-13700",
+    "AR-13100", "AR-13600"
+  ]
+
+  # Default split for single-run deployment training
+  train_active_regions: ["AR-13664", "AR-12887", "AR-13200", "AR-13450", "AR-13100", "AR-13600"]
+  val_active_regions: ["AR-13000", "AR-13300"]
+  test_active_regions: ["AR-12673", "AR-11158", "AR-13500", "AR-13700"]
+
+alert_thresholds:
+  low_risk: 0.30
+  moderate_risk: 0.55
+  high_risk: 0.75
+
+cme_transit_model:
+  typical_cme_speed_km_s: 1200
+  sun_earth_distance_km: 149600000
+  empirical_deceleration_factor: 0.85
