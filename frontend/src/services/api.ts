@@ -66,59 +66,168 @@ export interface SolarChannelsResponse {
 }
 
 // Helper to generate instant high-resolution SVG solar visualizations
-function makeSolarPatchURI(label: string, isFlare: boolean, colorScheme: "uv" | "gradcam" | "gradient" | "laplacian" | "temporal"): string {
+function makeSolarPatchURI(
+  label: string,
+  isFlare: boolean,
+  colorScheme: "uv" | "gradcam" | "gradient" | "laplacian" | "temporal",
+  mode: "superflare" | "shear" | "quiet" = "superflare"
+): string {
+  const uid = Math.random().toString(36).substring(2, 7);
   let innerElements = "";
+
   if (colorScheme === "uv") {
-    const sunColor = isFlare ? "#ff8c00" : "#ffb74d";
-    const coreColor = isFlare ? "#ffffff" : "#ffee58";
-    innerElements = `
-      <defs>
-        <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="${coreColor}" stop-opacity="1"/>
-          <stop offset="40%" stop-color="${sunColor}" stop-opacity="0.8"/>
-          <stop offset="85%" stop-color="#bf360c" stop-opacity="0.5"/>
-          <stop offset="100%" stop-color="#060919" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect width="256" height="256" fill="#030712"/>
-      <circle cx="128" cy="128" r="95" fill="url(#sunGlow)"/>
-      ${isFlare ? '<circle cx="140" cy="115" r="32" fill="#ffffff" filter="blur(6px)"/>' : ''}
-      <path d="M70,120 Q128,80 186,135 Q130,170 70,120" fill="none" stroke="#ffcc80" stroke-width="1.5" opacity="0.6"/>
-    `;
+    if (mode === "quiet") {
+      // Quiet Sun: Smooth, calm, uniform golden disk with NO white flare center
+      innerElements = `
+        <defs>
+          <radialGradient id="sunGlow_${uid}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffb74d" stop-opacity="0.95"/>
+            <stop offset="50%" stop-color="#fb8c00" stop-opacity="0.75"/>
+            <stop offset="85%" stop-color="#bf360c" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#030712"/>
+        <circle cx="128" cy="128" r="95" fill="url(#sunGlow_${uid})"/>
+      `;
+    } else if (mode === "shear") {
+      // AR-12673 (Shear): Double polarity glowing shear curve with compact flare
+      innerElements = `
+        <defs>
+          <radialGradient id="sunGlow_${uid}" cx="48%" cy="52%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="35%" stop-color="#ff9100" stop-opacity="0.85"/>
+            <stop offset="80%" stop-color="#b43503" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#030712"/>
+        <circle cx="128" cy="128" r="95" fill="url(#sunGlow_${uid})"/>
+        ${isFlare ? '<circle cx="125" cy="130" r="28" fill="#ffffff" filter="blur(5px)"/>' : ''}
+        <path d="M80,160 Q128,110 176,140 Q130,90 80,160" fill="none" stroke="#ffb74d" stroke-width="1.8" opacity="0.75"/>
+      `;
+    } else {
+      // AR-13664 (Superflare): Huge, burning white flaring core with wide magnetic arcade
+      innerElements = `
+        <defs>
+          <radialGradient id="sunGlow_${uid}" cx="54%" cy="45%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="40%" stop-color="#ff6d00" stop-opacity="0.9"/>
+            <stop offset="85%" stop-color="#b43503" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#030712"/>
+        <circle cx="128" cy="128" r="95" fill="url(#sunGlow_${uid})"/>
+        ${isFlare ? '<circle cx="140" cy="115" r="36" fill="#ffffff" filter="blur(6px)"/>' : ''}
+        <path d="M70,120 Q128,80 186,135 Q130,170 70,120" fill="none" stroke="#ffcc80" stroke-width="1.8" opacity="0.8"/>
+      `;
+    }
   } else if (colorScheme === "gradcam") {
-    innerElements = `
-      <defs>
-        <radialGradient id="attn" cx="55%" cy="45%" r="45%">
-          <stop offset="0%" stop-color="#ff1744" stop-opacity="0.95"/>
-          <stop offset="35%" stop-color="#ffea00" stop-opacity="0.8"/>
-          <stop offset="70%" stop-color="#00e5ff" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#030712" stop-opacity="0.1"/>
-        </radialGradient>
-      </defs>
-      <rect width="256" height="256" fill="#060919"/>
-      <circle cx="135" cy="118" r="85" fill="url(#attn)"/>
-      <circle cx="140" cy="115" r="24" fill="#ffffff" opacity="0.85" filter="blur(4px)"/>
-    `;
+    if (mode === "quiet") {
+      // Quiet Grad-CAM: Deep cool blue/cyan background with ZERO red/yellow attention
+      innerElements = `
+        <defs>
+          <radialGradient id="attn_${uid}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.3"/>
+            <stop offset="50%" stop-color="#0284c7" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#060919"/>
+        <circle cx="128" cy="128" r="90" fill="url(#attn_${uid})"/>
+      `;
+    } else if (mode === "shear") {
+      // AR-12673 Grad-CAM: High attention focused along the shear curve
+      innerElements = `
+        <defs>
+          <radialGradient id="attn_${uid}" cx="48%" cy="52%" r="48%">
+            <stop offset="0%" stop-color="#ff1744" stop-opacity="0.95"/>
+            <stop offset="35%" stop-color="#ff9100" stop-opacity="0.8"/>
+            <stop offset="70%" stop-color="#00e5ff" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0.1"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#060919"/>
+        <circle cx="125" cy="130" r="80" fill="url(#attn_${uid})"/>
+        <circle cx="125" cy="130" r="22" fill="#ffffff" opacity="0.9" filter="blur(4px)"/>
+      `;
+    } else {
+      // AR-13664 Grad-CAM: Intense red/yellow attention core
+      innerElements = `
+        <defs>
+          <radialGradient id="attn_${uid}" cx="55%" cy="45%" r="45%">
+            <stop offset="0%" stop-color="#ff1744" stop-opacity="0.98"/>
+            <stop offset="35%" stop-color="#ffea00" stop-opacity="0.88"/>
+            <stop offset="70%" stop-color="#00e5ff" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#030712" stop-opacity="0.1"/>
+          </radialGradient>
+        </defs>
+        <rect width="256" height="256" fill="#060919"/>
+        <circle cx="135" cy="118" r="85" fill="url(#attn_${uid})"/>
+        <circle cx="140" cy="115" r="26" fill="#ffffff" opacity="0.95" filter="blur(4px)"/>
+      `;
+    }
   } else if (colorScheme === "gradient") {
-    innerElements = `
-      <rect width="256" height="256" fill="#020817"/>
-      <path d="M40,60 Q128,140 216,70" stroke="#00e5ff" stroke-width="3" fill="none" opacity="0.8"/>
-      <path d="M60,180 Q140,110 200,190" stroke="#00b0ff" stroke-width="2.5" fill="none" opacity="0.7"/>
-      <circle cx="135" cy="120" r="45" stroke="#ff3d00" stroke-width="2" fill="none" stroke-dasharray="4,4"/>
-    `;
+    if (mode === "quiet") {
+      innerElements = `
+        <rect width="256" height="256" fill="#020817"/>
+        <path d="M50,128 Q128,125 206,128" stroke="#0284c7" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <circle cx="128" cy="128" r="30" stroke="#00e5ff" stroke-width="1" fill="none" opacity="0.3"/>
+      `;
+    } else if (mode === "shear") {
+      innerElements = `
+        <rect width="256" height="256" fill="#020817"/>
+        <path d="M50,70 Q128,135 200,80" stroke="#ff9100" stroke-width="3" fill="none" opacity="0.85"/>
+        <circle cx="125" cy="130" r="38" stroke="#ff3d00" stroke-width="2" fill="none" stroke-dasharray="4,4"/>
+      `;
+    } else {
+      innerElements = `
+        <rect width="256" height="256" fill="#020817"/>
+        <path d="M40,60 Q128,140 216,70" stroke="#00e5ff" stroke-width="3" fill="none" opacity="0.8"/>
+        <path d="M60,180 Q140,110 200,190" stroke="#00b0ff" stroke-width="2.5" fill="none" opacity="0.7"/>
+        <circle cx="135" cy="120" r="45" stroke="#ff3d00" stroke-width="2" fill="none" stroke-dasharray="4,4"/>
+      `;
+    }
   } else if (colorScheme === "laplacian") {
-    innerElements = `
-      <rect width="256" height="256" fill="#020617"/>
-      <circle cx="128" cy="128" r="70" stroke="#7c4dff" stroke-width="2" fill="none" opacity="0.7"/>
-      <circle cx="128" cy="128" r="40" stroke="#e040fb" stroke-width="2.5" fill="none" opacity="0.85"/>
-      <circle cx="138" cy="118" r="16" stroke="#00e5ff" stroke-width="3" fill="none"/>
-    `;
+    if (mode === "quiet") {
+      innerElements = `
+        <rect width="256" height="256" fill="#020617"/>
+        <circle cx="128" cy="128" r="50" stroke="#6366f1" stroke-width="1.5" fill="none" opacity="0.4"/>
+      `;
+    } else if (mode === "shear") {
+      innerElements = `
+        <rect width="256" height="256" fill="#020617"/>
+        <ellipse cx="125" cy="130" rx="55" ry="35" stroke="#e040fb" stroke-width="2.5" fill="none" opacity="0.85"/>
+        <circle cx="125" cy="130" r="15" stroke="#ff4081" stroke-width="2.5" fill="none"/>
+      `;
+    } else {
+      innerElements = `
+        <rect width="256" height="256" fill="#020617"/>
+        <circle cx="128" cy="128" r="70" stroke="#7c4dff" stroke-width="2" fill="none" opacity="0.7"/>
+        <circle cx="128" cy="128" r="40" stroke="#e040fb" stroke-width="2.5" fill="none" opacity="0.85"/>
+        <circle cx="138" cy="118" r="16" stroke="#00e5ff" stroke-width="3" fill="none"/>
+      `;
+    }
   } else {
-    innerElements = `
-      <rect width="256" height="256" fill="#05081c"/>
-      <circle cx="130" cy="120" r="50" fill="#00e5ff" opacity="0.3"/>
-      <circle cx="145" cy="115" r="30" fill="#ff334b" opacity="0.5"/>
-    `;
+    if (mode === "quiet") {
+      innerElements = `
+        <rect width="256" height="256" fill="#05081c"/>
+        <circle cx="128" cy="128" r="35" fill="#00e5ff" opacity="0.15"/>
+      `;
+    } else if (mode === "shear") {
+      innerElements = `
+        <rect width="256" height="256" fill="#05081c"/>
+        <ellipse cx="125" cy="130" rx="45" ry="30" fill="#00e5ff" opacity="0.3"/>
+        <circle cx="135" cy="125" r="22" fill="#ff9100" opacity="0.6"/>
+      `;
+    } else {
+      innerElements = `
+        <rect width="256" height="256" fill="#05081c"/>
+        <circle cx="130" cy="120" r="50" fill="#00e5ff" opacity="0.3"/>
+        <circle cx="145" cy="115" r="30" fill="#ff334b" opacity="0.65"/>
+      `;
+    }
   }
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
@@ -366,31 +475,147 @@ export const FALLBACK_PREDICTIONS: Record<string, PredictResponse> = {
 };
 
 export const FALLBACK_GRADCAM: Record<string, GradCamResponse> = {
+  AR3664_Impending_X_Flare: {
+    attribution_note: "PyTorch Autograd Grad-CAM Saliency computed over ConvLSTM sequence layer.",
+    frames: [
+      {
+        step: "T - 9 hrs",
+        patch_base64: makeSolarPatchURI("AR-13664 T-9h UV", false, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-9h", false, "gradcam", "superflare"),
+        peak_attention_score: 0.42,
+      },
+      {
+        step: "T - 6 hrs",
+        patch_base64: makeSolarPatchURI("AR-13664 T-6h UV", false, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-6h", false, "gradcam", "superflare"),
+        peak_attention_score: 0.65,
+      },
+      {
+        step: "T - 3 hrs",
+        patch_base64: makeSolarPatchURI("AR-13664 T-3h UV", true, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-3h", true, "gradcam", "superflare"),
+        peak_attention_score: 0.84,
+      },
+      {
+        step: "T_0 (Now)",
+        patch_base64: makeSolarPatchURI("AR-13664 T_0 UV (Now)", true, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T_0 (Now)", true, "gradcam", "superflare"),
+        peak_attention_score: 0.96,
+      },
+    ],
+  },
+  AR3685_M_Class_Eruption: {
+    attribution_note: "PyTorch Autograd Grad-CAM Saliency computed over ConvLSTM sequence layer.",
+    frames: [
+      {
+        step: "T - 9 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-9h UV", false, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-9h", false, "gradcam", "shear"),
+        peak_attention_score: 0.38,
+      },
+      {
+        step: "T - 6 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-6h UV", false, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-6h", false, "gradcam", "shear"),
+        peak_attention_score: 0.58,
+      },
+      {
+        step: "T - 3 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-3h UV", true, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-3h", true, "gradcam", "shear"),
+        peak_attention_score: 0.79,
+      },
+      {
+        step: "T_0 (Now)",
+        patch_base64: makeSolarPatchURI("AR-12673 T_0 UV (Now)", true, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T_0 (Now)", true, "gradcam", "shear"),
+        peak_attention_score: 0.91,
+      },
+    ],
+  },
+  AR12673_Impending_M_Flare: {
+    attribution_note: "PyTorch Autograd Grad-CAM Saliency computed over ConvLSTM sequence layer.",
+    frames: [
+      {
+        step: "T - 9 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-9h UV", false, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-9h", false, "gradcam", "shear"),
+        peak_attention_score: 0.38,
+      },
+      {
+        step: "T - 6 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-6h UV", false, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-6h", false, "gradcam", "shear"),
+        peak_attention_score: 0.58,
+      },
+      {
+        step: "T - 3 hrs",
+        patch_base64: makeSolarPatchURI("AR-12673 T-3h UV", true, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-3h", true, "gradcam", "shear"),
+        peak_attention_score: 0.79,
+      },
+      {
+        step: "T_0 (Now)",
+        patch_base64: makeSolarPatchURI("AR-12673 T_0 UV (Now)", true, "uv", "shear"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T_0 (Now)", true, "gradcam", "shear"),
+        peak_attention_score: 0.91,
+      },
+    ],
+  },
+  AR3670_Quiet_Sun: {
+    attribution_note: "PyTorch Autograd Grad-CAM Saliency computed over ConvLSTM sequence layer (Nominal Solar Minimum).",
+    frames: [
+      {
+        step: "T - 9 hrs",
+        patch_base64: makeSolarPatchURI("AR-13100 Quiet Sun", false, "uv", "quiet"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM Quiet T-9h", false, "gradcam", "quiet"),
+        peak_attention_score: 0.08,
+      },
+      {
+        step: "T - 6 hrs",
+        patch_base64: makeSolarPatchURI("AR-13100 Quiet Sun", false, "uv", "quiet"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM Quiet T-6h", false, "gradcam", "quiet"),
+        peak_attention_score: 0.09,
+      },
+      {
+        step: "T - 3 hrs",
+        patch_base64: makeSolarPatchURI("AR-13100 Quiet Sun", false, "uv", "quiet"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM Quiet T-3h", false, "gradcam", "quiet"),
+        peak_attention_score: 0.11,
+      },
+      {
+        step: "T_0 (Now)",
+        patch_base64: makeSolarPatchURI("AR-13100 Quiet Sun (Nominal)", false, "uv", "quiet"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM Quiet T_0", false, "gradcam", "quiet"),
+        peak_attention_score: 0.12,
+      },
+    ],
+  },
   default: {
     attribution_note: "PyTorch Autograd Grad-CAM Saliency computed over ConvLSTM sequence layer.",
     frames: [
       {
         step: "T - 9 hrs",
-        patch_base64: makeSolarPatchURI("SUIT T-9h UV", false, "uv"),
-        gradcam_base64: makeSolarPatchURI("Grad-CAM T-9h", false, "gradcam"),
+        patch_base64: makeSolarPatchURI("SUIT T-9h UV", false, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-9h", false, "gradcam", "superflare"),
         peak_attention_score: 0.42,
       },
       {
         step: "T - 6 hrs",
-        patch_base64: makeSolarPatchURI("SUIT T-6h UV", false, "uv"),
-        gradcam_base64: makeSolarPatchURI("Grad-CAM T-6h", false, "gradcam"),
+        patch_base64: makeSolarPatchURI("SUIT T-6h UV", false, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-6h", false, "gradcam", "superflare"),
         peak_attention_score: 0.65,
       },
       {
         step: "T - 3 hrs",
-        patch_base64: makeSolarPatchURI("SUIT T-3h UV", true, "uv"),
-        gradcam_base64: makeSolarPatchURI("Grad-CAM T-3h", true, "gradcam"),
+        patch_base64: makeSolarPatchURI("SUIT T-3h UV", true, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T-3h", true, "gradcam", "superflare"),
         peak_attention_score: 0.84,
       },
       {
         step: "T_0 (Now)",
-        patch_base64: makeSolarPatchURI("SUIT T_0 UV (Now)", true, "uv"),
-        gradcam_base64: makeSolarPatchURI("Grad-CAM T_0 (Now)", true, "gradcam"),
+        patch_base64: makeSolarPatchURI("SUIT T_0 UV (Now)", true, "uv", "superflare"),
+        gradcam_base64: makeSolarPatchURI("Grad-CAM T_0 (Now)", true, "gradcam", "superflare"),
         peak_attention_score: 0.96,
       },
     ],
@@ -398,32 +623,148 @@ export const FALLBACK_GRADCAM: Record<string, GradCamResponse> = {
 };
 
 export const FALLBACK_CHANNELS: Record<string, SolarChannelsResponse> = {
-  default: {
-    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024", true, "uv"),
+  AR3664_Impending_X_Flare: {
+    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024", true, "uv", "superflare"),
     channels: [
       {
         id: "ch0",
         name: "Channel 0: SUIT 279.6 nm UV Intensity",
         description: "Narrowband calibrated photospheric continuum flux in solar units.",
-        image_base64: makeSolarPatchURI("Ch 0: UV Intensity", true, "uv"),
+        image_base64: makeSolarPatchURI("Ch 0: UV Intensity", true, "uv", "superflare"),
       },
       {
         id: "ch1",
         name: "Channel 1: Spatial Gradient Shear |∇I|",
         description: "Sobel operator spatial intensity gradient highlighting magnetic polarity inversion lines.",
-        image_base64: makeSolarPatchURI("Ch 1: Spatial Gradient |∇I|", true, "gradient"),
+        image_base64: makeSolarPatchURI("Ch 1: Spatial Gradient |∇I|", true, "gradient", "superflare"),
       },
       {
         id: "ch2",
         name: "Channel 2: Laplacian Curvature ∇²I",
         description: "Second-order discrete Laplacian tracking fine-scale flux bundle twist and topological helicity.",
-        image_base64: makeSolarPatchURI("Ch 2: Laplacian ∇²I", true, "laplacian"),
+        image_base64: makeSolarPatchURI("Ch 2: Laplacian ∇²I", true, "laplacian", "superflare"),
       },
       {
         id: "ch3",
         name: "Channel 3: Temporal Differential Rate ΔIt",
         description: "Frame-to-frame flux rate of change (∂I/∂t) capturing rapid flare precursor brightening.",
-        image_base64: makeSolarPatchURI("Ch 3: Temporal Rate ΔI_t", true, "temporal"),
+        image_base64: makeSolarPatchURI("Ch 3: Temporal Rate ΔI_t", true, "temporal", "superflare"),
+      },
+    ],
+  },
+  AR3685_M_Class_Eruption: {
+    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024", true, "uv", "shear"),
+    channels: [
+      {
+        id: "ch0",
+        name: "Channel 0: SUIT 279.6 nm UV Intensity",
+        description: "Narrowband calibrated photospheric continuum flux in solar units.",
+        image_base64: makeSolarPatchURI("Ch 0: UV Intensity", true, "uv", "shear"),
+      },
+      {
+        id: "ch1",
+        name: "Channel 1: Spatial Gradient Shear |∇I|",
+        description: "Sobel operator spatial intensity gradient highlighting magnetic polarity inversion lines.",
+        image_base64: makeSolarPatchURI("Ch 1: Spatial Gradient |∇I|", true, "gradient", "shear"),
+      },
+      {
+        id: "ch2",
+        name: "Channel 2: Laplacian Curvature ∇²I",
+        description: "Second-order discrete Laplacian tracking fine-scale flux bundle twist and topological helicity.",
+        image_base64: makeSolarPatchURI("Ch 2: Laplacian ∇²I", true, "laplacian", "shear"),
+      },
+      {
+        id: "ch3",
+        name: "Channel 3: Temporal Differential Rate ΔIt",
+        description: "Frame-to-frame flux rate of change (∂I/∂t) capturing rapid flare precursor brightening.",
+        image_base64: makeSolarPatchURI("Ch 3: Temporal Rate ΔI_t", true, "temporal", "shear"),
+      },
+    ],
+  },
+  AR12673_Impending_M_Flare: {
+    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024", true, "uv", "shear"),
+    channels: [
+      {
+        id: "ch0",
+        name: "Channel 0: SUIT 279.6 nm UV Intensity",
+        description: "Narrowband calibrated photospheric continuum flux in solar units.",
+        image_base64: makeSolarPatchURI("Ch 0: UV Intensity", true, "uv", "shear"),
+      },
+      {
+        id: "ch1",
+        name: "Channel 1: Spatial Gradient Shear |∇I|",
+        description: "Sobel operator spatial intensity gradient highlighting magnetic polarity inversion lines.",
+        image_base64: makeSolarPatchURI("Ch 1: Spatial Gradient |∇I|", true, "gradient", "shear"),
+      },
+      {
+        id: "ch2",
+        name: "Channel 2: Laplacian Curvature ∇²I",
+        description: "Second-order discrete Laplacian tracking fine-scale flux bundle twist and topological helicity.",
+        image_base64: makeSolarPatchURI("Ch 2: Laplacian ∇²I", true, "laplacian", "shear"),
+      },
+      {
+        id: "ch3",
+        name: "Channel 3: Temporal Differential Rate ΔIt",
+        description: "Frame-to-frame flux rate of change (∂I/∂t) capturing rapid flare precursor brightening.",
+        image_base64: makeSolarPatchURI("Ch 3: Temporal Rate ΔI_t", true, "temporal", "shear"),
+      },
+    ],
+  },
+  AR3670_Quiet_Sun: {
+    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024 (Nominal)", false, "uv", "quiet"),
+    channels: [
+      {
+        id: "ch0",
+        name: "Channel 0: SUIT 279.6 nm UV Intensity (Nominal)",
+        description: "Narrowband calibrated photospheric continuum flux in solar units (Quiet Sun).",
+        image_base64: makeSolarPatchURI("Ch 0: UV Intensity (Quiet)", false, "uv", "quiet"),
+      },
+      {
+        id: "ch1",
+        name: "Channel 1: Spatial Gradient Shear |∇I| (Minimal)",
+        description: "Sobel operator spatial intensity gradient showing zero magnetic polarity shear.",
+        image_base64: makeSolarPatchURI("Ch 1: Low Gradient", false, "gradient", "quiet"),
+      },
+      {
+        id: "ch2",
+        name: "Channel 2: Laplacian Curvature ∇²I (Quiescent)",
+        description: "Second-order discrete Laplacian tracking flat, untwisted magnetic topology.",
+        image_base64: makeSolarPatchURI("Ch 2: Low Curvature", false, "laplacian", "quiet"),
+      },
+      {
+        id: "ch3",
+        name: "Channel 3: Temporal Differential Rate ΔIt (Zero Precursor)",
+        description: "Frame-to-frame flux rate of change (∂I/∂t) showing stable steady-state solar minimum.",
+        image_base64: makeSolarPatchURI("Ch 3: Low Rate ΔI_t", false, "temporal", "quiet"),
+      },
+    ],
+  },
+  default: {
+    full_disk: makeSolarPatchURI("Aditya-L1 SUIT 1024x1024", true, "uv", "superflare"),
+    channels: [
+      {
+        id: "ch0",
+        name: "Channel 0: SUIT 279.6 nm UV Intensity",
+        description: "Narrowband calibrated photospheric continuum flux in solar units.",
+        image_base64: makeSolarPatchURI("Ch 0: UV Intensity", true, "uv", "superflare"),
+      },
+      {
+        id: "ch1",
+        name: "Channel 1: Spatial Gradient Shear |∇I|",
+        description: "Sobel operator spatial intensity gradient highlighting magnetic polarity inversion lines.",
+        image_base64: makeSolarPatchURI("Ch 1: Spatial Gradient |∇I|", true, "gradient", "superflare"),
+      },
+      {
+        id: "ch2",
+        name: "Channel 2: Laplacian Curvature ∇²I",
+        description: "Second-order discrete Laplacian tracking fine-scale flux bundle twist and topological helicity.",
+        image_base64: makeSolarPatchURI("Ch 2: Laplacian ∇²I", true, "laplacian", "superflare"),
+      },
+      {
+        id: "ch3",
+        name: "Channel 3: Temporal Differential Rate ΔIt",
+        description: "Frame-to-frame flux rate of change (∂I/∂t) capturing rapid flare precursor brightening.",
+        image_base64: makeSolarPatchURI("Ch 3: Temporal Rate ΔI_t", true, "temporal", "superflare"),
       },
     ],
   },
@@ -449,7 +790,7 @@ export const fetchGradCam = async (scenario_id: string = "AR3664_Impending_X_Fla
     });
     return res.data;
   } catch {
-    return FALLBACK_GRADCAM["default"];
+    return FALLBACK_GRADCAM[scenario_id] || FALLBACK_GRADCAM["default"];
   }
 };
 
@@ -460,7 +801,7 @@ export const fetchSolarChannels = async (scenario_id: string = "AR3664_Impending
     });
     return res.data;
   } catch {
-    return FALLBACK_CHANNELS["default"];
+    return FALLBACK_CHANNELS[scenario_id] || FALLBACK_CHANNELS["default"];
   }
 };
 

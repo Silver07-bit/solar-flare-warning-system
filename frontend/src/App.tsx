@@ -69,7 +69,7 @@ export function App() {
       <BlanketMesh isFlareActive={isFlareActive} />
 
       {/* Radial Spotlight */}
-      <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="rgba(0, 229, 255, 0.18)" />
+      <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="rgba(0, 176, 255, 0.04)" />
 
       {/* Top Mission Header */}
       <Header

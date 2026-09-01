@@ -63,9 +63,8 @@ export const Vortex = ({
     }
 
     const render = () => {
-      // Create motion blur trail in deep space navy-black
-      ctx.fillStyle = "rgba(3, 7, 18, 0.28)";
-      ctx.fillRect(0, 0, width, height);
+      // Clear canvas cleanly so background color stays perfectly constant and dark navy
+      ctx.clearRect(0, 0, width, height);
 
       const centerX = width / 2;
       const centerY = height / 2;

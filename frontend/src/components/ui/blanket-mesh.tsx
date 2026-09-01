@@ -163,7 +163,7 @@ export const BlanketMesh = ({
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw Space Background Nebula in Deep Navy & Subtle Cyan
+      // 1. Draw Space Background Nebula in Deep Constant Dark Navy
       const nebulaGrad = ctx.createRadialGradient(
         width * 0.5,
         height * 0.3,
@@ -172,9 +172,9 @@ export const BlanketMesh = ({
         height * 0.5,
         width * 0.75
       );
-      nebulaGrad.addColorStop(0, "rgba(0, 229, 255, 0.05)");
-      nebulaGrad.addColorStop(0.5, "rgba(6, 9, 25, 0.35)");
-      nebulaGrad.addColorStop(1, "rgba(3, 7, 18, 0.95)");
+      nebulaGrad.addColorStop(0, "rgba(4, 12, 34, 0.98)");
+      nebulaGrad.addColorStop(0.5, "rgba(3, 8, 22, 0.99)");
+      nebulaGrad.addColorStop(1, "rgba(2, 6, 23, 1)");
       ctx.fillStyle = nebulaGrad;
       ctx.fillRect(0, 0, width, height);
 
