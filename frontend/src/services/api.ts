@@ -142,30 +142,30 @@ function makeSolarPatchURI(
       innerElements = `
         <defs>
           <radialGradient id="attn_${uid}" cx="48%" cy="52%" r="48%">
-            <stop offset="0%" stop-color="#ff1744" stop-opacity="0.95"/>
-            <stop offset="35%" stop-color="#ff9100" stop-opacity="0.8"/>
+            <stop offset="0%" stop-color="#ff1744" stop-opacity="${isFlare ? '0.95' : '0.65'}"/>
+            <stop offset="35%" stop-color="#ff9100" stop-opacity="${isFlare ? '0.8' : '0.5'}"/>
             <stop offset="70%" stop-color="#00e5ff" stop-opacity="0.35"/>
             <stop offset="100%" stop-color="#030712" stop-opacity="0.1"/>
           </radialGradient>
         </defs>
         <rect width="256" height="256" fill="#060919"/>
-        <circle cx="125" cy="130" r="80" fill="url(#attn_${uid})"/>
-        <circle cx="125" cy="130" r="22" fill="#ffffff" opacity="0.9" filter="blur(4px)"/>
+        <circle cx="125" cy="130" r="${isFlare ? '80' : '65'}" fill="url(#attn_${uid})"/>
+        ${isFlare ? '<circle cx="125" cy="130" r="22" fill="#ffffff" opacity="0.9" filter="blur(4px)"/>' : ''}
       `;
     } else {
-      // AR-13664 Grad-CAM: Intense red/yellow attention core
+      // AR-13664 Grad-CAM: Progressive attention from diffuse (T-9h: 0.42) to sharp fiery core (T_0: 0.96)
       innerElements = `
         <defs>
           <radialGradient id="attn_${uid}" cx="55%" cy="45%" r="45%">
-            <stop offset="0%" stop-color="#ff1744" stop-opacity="0.98"/>
-            <stop offset="35%" stop-color="#ffea00" stop-opacity="0.88"/>
-            <stop offset="70%" stop-color="#00e5ff" stop-opacity="0.4"/>
+            <stop offset="0%" stop-color="${isFlare ? '#ff1744' : '#ffab00'}" stop-opacity="${isFlare ? '0.98' : '0.7'}"/>
+            <stop offset="40%" stop-color="${isFlare ? '#ffea00' : '#00e5ff'}" stop-opacity="${isFlare ? '0.88' : '0.45'}"/>
+            <stop offset="75%" stop-color="#00e5ff" stop-opacity="0.25"/>
             <stop offset="100%" stop-color="#030712" stop-opacity="0.1"/>
           </radialGradient>
         </defs>
         <rect width="256" height="256" fill="#060919"/>
-        <circle cx="135" cy="118" r="85" fill="url(#attn_${uid})"/>
-        <circle cx="140" cy="115" r="26" fill="#ffffff" opacity="0.95" filter="blur(4px)"/>
+        <circle cx="135" cy="118" r="${isFlare ? '85' : '70'}" fill="url(#attn_${uid})"/>
+        ${isFlare ? '<circle cx="140" cy="115" r="26" fill="#ffffff" opacity="0.95" filter="blur(4px)"/>' : ''}
       `;
     }
   } else if (colorScheme === "gradient") {
