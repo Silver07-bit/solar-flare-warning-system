@@ -10,13 +10,17 @@ import { TabDiagnostics } from "./components/TabDiagnostics";
 import { TabGradCAM } from "./components/TabGradCAM";
 import { TabGridSimulation } from "./components/TabGridSimulation";
 import { TabTelemetryBulletin } from "./components/TabTelemetryBulletin";
+import { CustomImageUploadModal } from "./components/CustomImageUploadModal";
 import {
   fetchPrediction,
   fetchGradCam,
+  uploadAndPredictCustomImages,
   FALLBACK_PREDICTIONS,
   FALLBACK_GRADCAM,
   type PredictResponse,
   type GradCamResponse,
+  type SolarChannelsResponse,
+  type CustomUploadResult,
 } from "./services/api";
 import { Activity, Layers, Cpu, ShieldAlert, Award, Compass, Eye } from "lucide-react";
 
@@ -28,9 +32,19 @@ export function App() {
     FALLBACK_PREDICTIONS["AR3664_Impending_X_Flare"]
   );
   const [gradcam, setGradcam] = useState<GradCamResponse>(FALLBACK_GRADCAM["default"]);
+  const [customChannels, setCustomChannels] = useState<SolarChannelsResponse | null>(null);
+  const [customUploadData, setCustomUploadData] = useState<{
+    images: string[];
+    activeRegion: string;
+    observationTime?: string;
+  } | null>(null);
+  const [isReRunning, setIsReRunning] = useState<boolean>(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const loadData = async (sc: string) => {
+    if (sc === "CUSTOM_UPLOAD") return;
+
     // Set fallback immediately for 0ms lag
     if (FALLBACK_PREDICTIONS[sc]) {
       setPrediction(FALLBACK_PREDICTIONS[sc]);
@@ -53,6 +67,44 @@ export function App() {
     loadData(scenario);
   }, [scenario]);
 
+  const handleUploadSuccess = (
+    result: CustomUploadResult,
+    _customLabel: string,
+    rawImages: string[],
+    activeRegion: string,
+    observationTime?: string
+  ) => {
+    setCustomUploadData({
+      images: rawImages,
+      activeRegion,
+      observationTime,
+    });
+    setPrediction(result.prediction);
+    setGradcam(result.gradcam);
+    setCustomChannels(result.solar_channels);
+    setScenario("CUSTOM_UPLOAD");
+    setViewMode("dashboard");
+  };
+
+  const handleReRunInference = async () => {
+    if (!customUploadData || customUploadData.images.length === 0) return;
+    setIsReRunning(true);
+    try {
+      const result = await uploadAndPredictCustomImages(
+        customUploadData.images,
+        customUploadData.activeRegion,
+        customUploadData.observationTime
+      );
+      setPrediction(result.prediction);
+      setGradcam(result.gradcam);
+      setCustomChannels(result.solar_channels);
+    } catch (err) {
+      console.error("Re-run inference failed:", err);
+    } finally {
+      setIsReRunning(false);
+    }
+  };
+
   const isFlareActive = scenario !== "AR3670_Quiet_Sun";
 
   const tabs = [
@@ -65,6 +117,13 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-space-950 text-slate-100 relative selection:bg-cyan-500 selection:text-black font-sans">
+      {/* Custom Solar Sequence Upload Modal */}
+      <CustomImageUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploadSuccess={handleUploadSuccess}
+      />
+
       {/* Interactive Elastic Blanket Mesh Physics */}
       <BlanketMesh isFlareActive={isFlareActive} />
 
@@ -77,6 +136,10 @@ export function App() {
         setScenario={setScenario}
         riskLevel={prediction?.risk_level || "MODERATE"}
         targetAR={prediction?.target_active_region || "AR-13664"}
+        onOpenUploadModal={() => setIsUploadModalOpen(true)}
+        onReRunInference={handleReRunInference}
+        isReRunning={isReRunning}
+        hasCustomUpload={!!customUploadData}
       />
 
       {/* Top View Mode Switcher */}
@@ -190,9 +253,11 @@ export function App() {
                         prediction={prediction}
                         gradcam={gradcam}
                         loading={loading}
+                        onReRunInference={handleReRunInference}
+                        isReRunning={isReRunning}
                       />
                     )}
-                    {activeTab === 1 && <TabDiagnostics scenario={scenario} />}
+                    {activeTab === 1 && <TabDiagnostics scenario={scenario} customChannels={customChannels} />}
                     {activeTab === 2 && <TabGradCAM gradcam={gradcam} />}
                     {activeTab === 3 && (
                       <TabGridSimulation

@@ -148,19 +148,42 @@ def compute_high_frequency_curvature(gray_image):
 
 def compute_optical_flux_and_shear_proxies(patch):
     """
-    Computes honest optical and topological image proxies from the active region patch:
+    Computes authentic optical and topological image proxies from the active region patch:
+      - Peak Intensity (I_max)
+      - Mean Intensity (mu_I)
+      - Peak Intensity Gradient Magnitude (|∇I|) [Spatial Shear Proxy]
+      - Mean Gradient Magnitude
+      - Active High-Flux Pixel Count (I > 0.65)
       - Total Optical Intensity Flux Proxy (Φ_opt)
-      - Peak Intensity Gradient Magnitude (|∇I|)
-      - Topological Active Region Complexity Index
+      - Topological Active Region Complexity Index (Hale beta-gamma-delta proxy)
     """
-    phi_proxy = float(np.sum(patch) / 1000.0)
+    patch_f32 = patch.astype(np.float32)
+    peak_intensity = float(np.max(patch_f32))
+    mean_intensity = float(np.mean(patch_f32))
+    active_pixels = int(np.sum(patch_f32 > 0.65))
+    total_flux_proxy = float(active_pixels * 12.0) if active_pixels > 0 else float(np.sum(patch_f32))
+
+    gx = cv2.Sobel(patch_f32, cv2.CV_32F, 1, 0, ksize=3)
+    gy = cv2.Sobel(patch_f32, cv2.CV_32F, 0, 1, ksize=3)
+    grad_mag = cv2.magnitude(gx, gy)
+    max_gradient = float(np.max(grad_mag) / (4.0 * np.sqrt(2.0) + 1e-8))
+    mean_gradient = float(np.mean(grad_mag) / (4.0 * np.sqrt(2.0) + 1e-8))
+
     grad_norm, contours = compute_magnetic_flux_gradient(patch)
-    max_gradient = float(np.max(grad_norm))
+    complexity_index = float(min(2.5, 0.4 + max_gradient * 1.5 + (active_pixels / 2000.0) * 0.6))
     shear_complexity = float(len(contours) * 1.5 + (np.mean(grad_norm) * 100.0))
 
     return {
-        "unsigned_flux_proxy": phi_proxy,
-        "max_flux_gradient": max_gradient,
+        "peak_intensity": round(min(1.0, peak_intensity), 2),
+        "mean_intensity": round(min(1.0, mean_intensity), 2),
+        "total_flux_proxy": round(total_flux_proxy, 1),
+        "max_gradient": round(min(1.0, max_gradient), 2),
+        "mean_gradient": round(min(1.0, mean_gradient), 2),
+        "active_pixel_count": active_pixels,
+        "complexity_index": round(complexity_index, 2),
+        # Backwards compatibility keys
+        "unsigned_flux_proxy": float(np.sum(patch) / 1000.0),
+        "max_flux_gradient": round(min(1.0, max_gradient), 2),
         "shear_complexity_index": min(100.0, shear_complexity),
         "total_contour_loops": len(contours)
     }

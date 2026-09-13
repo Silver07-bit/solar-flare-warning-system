@@ -2,18 +2,22 @@ import React from "react";
 import { motion } from "framer-motion";
 import { GlowingCard } from "./ui/glowing-card";
 import type { PredictResponse, GradCamResponse, GradCamFrame } from "../services/api";
-import { Zap, Activity, Flame, BarChart3 } from "lucide-react";
+import { Zap, Activity, Flame, BarChart3, RefreshCw } from "lucide-react";
 
 interface TabMissionControlProps {
   prediction: PredictResponse | null;
   gradcam: GradCamResponse | null;
   loading: boolean;
+  onReRunInference?: () => void;
+  isReRunning?: boolean;
 }
 
 export const TabMissionControl: React.FC<TabMissionControlProps> = ({
   prediction,
   gradcam,
   loading,
+  onReRunInference,
+  isReRunning,
 }) => {
   if (loading || !prediction) {
     return (
@@ -62,6 +66,17 @@ export const TabMissionControl: React.FC<TabMissionControlProps> = ({
         </div>
 
         <div className="flex items-center gap-2 font-mono text-xs">
+          {onReRunInference && (
+            <button
+              onClick={onReRunInference}
+              disabled={isReRunning}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50"
+              title="Re-run AI forecasting on currently loaded solar images"
+            >
+              <RefreshCw className={`h-3 w-3 text-amber-400 ${isReRunning ? "animate-spin" : ""}`} />
+              <span>{isReRunning ? "Re-evaluating..." : "Re-run Inference"}</span>
+            </button>
+          )}
           <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             PRADAN Pipeline Ready
           </span>
@@ -79,7 +94,7 @@ export const TabMissionControl: React.FC<TabMissionControlProps> = ({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-white font-bold text-base">
                 <Flame className="h-5 w-5 text-amber-400" />
-                Spatio-Temporal Observation Reel (T-3 to T_0)
+                Spatio-Temporal Observation Reel (T-9 to T_0)
               </div>
               <span className="text-xs font-mono text-slate-400">
                 SUIT 279.6 nm Filter
@@ -132,10 +147,30 @@ export const TabMissionControl: React.FC<TabMissionControlProps> = ({
                 <Zap className="h-5 w-5 text-cyan-400" />
                 24h & 48h Eruption Probability
               </div>
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              <span
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
+                  prediction.predicted_class === "X-Class"
+                    ? "bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm shadow-rose-950/50"
+                    : prediction.predicted_class === "M-Class"
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-950/50"
+                    : prediction.predicted_class.includes("Borderline")
+                    ? "bg-amber-400/20 text-amber-200 border-amber-400/50 animate-pulse shadow-md shadow-amber-950/60"
+                    : prediction.predicted_class === "C-Class"
+                    ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                    : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                }`}
+              >
                 {prediction.predicted_class}
               </span>
             </div>
+
+            {/* Borderline Notice if in transition zone */}
+            {prediction.predicted_class.includes("Borderline") && (
+              <div className="mb-3 px-3 py-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 text-[11px] text-amber-300 flex items-center justify-between font-mono">
+                <span>⚠️ Operational Transition Zone</span>
+                <span className="text-slate-400 text-[10px]">TSS Calibrated (45–68%)</span>
+              </div>
+            )}
 
             {/* Gauge meters */}
             <div className="grid grid-cols-2 gap-4 text-center my-3">

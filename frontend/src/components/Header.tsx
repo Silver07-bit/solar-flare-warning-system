@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AlertTriangle, ShieldCheck, Sun, Compass } from "lucide-react";
+import { AlertTriangle, ShieldCheck, Sun, Compass, Upload, RefreshCw } from "lucide-react";
 import { MovingBorderBadge } from "./ui/moving-border";
 
 interface HeaderProps {
@@ -7,6 +7,10 @@ interface HeaderProps {
   setScenario: (sc: string) => void;
   riskLevel: string;
   targetAR: string;
+  onOpenUploadModal?: () => void;
+  onReRunInference?: () => void;
+  isReRunning?: boolean;
+  hasCustomUpload?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,6 +18,10 @@ export const Header: React.FC<HeaderProps> = ({
   setScenario,
   riskLevel,
   targetAR,
+  onOpenUploadModal,
+  onReRunInference,
+  isReRunning,
+  hasCustomUpload,
 }) => {
   const [utcTime, setUtcTime] = useState("");
   const [istTime, setIstTime] = useState("");
@@ -69,6 +77,30 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Live Controls & Telemetry */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Custom Upload Button */}
+          {onOpenUploadModal && (
+            <button
+              onClick={onOpenUploadModal}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold shadow-sm shadow-cyan-950/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <Upload className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Upload Solar Images</span>
+            </button>
+          )}
+
+          {/* Re-run AI Inference on Cached Inputs */}
+          {onReRunInference && (hasCustomUpload || scenario === "CUSTOM_UPLOAD") && (
+            <button
+              onClick={onReRunInference}
+              disabled={isReRunning}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-600/20 hover:from-amber-500/30 hover:to-orange-600/30 border border-amber-500/40 text-amber-300 text-xs font-semibold shadow-sm shadow-amber-950/40 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50"
+              title="Re-run AI forecasting on currently loaded solar images without re-uploading"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-amber-400 ${isReRunning ? "animate-spin" : ""}`} />
+              <span>{isReRunning ? "Recalculating..." : "Re-run Inference"}</span>
+            </button>
+          )}
+
           {/* Scenario Picker */}
           <div className="flex items-center gap-2 bg-space-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs">
             <Compass className="h-4 w-4 text-cyan-400" />
@@ -86,6 +118,11 @@ export const Header: React.FC<HeaderProps> = ({
               <option value="AR3670_Quiet_Sun" className="bg-space-900">
                 AR-13100 (Quiet Solar Baseline)
               </option>
+              {scenario === "CUSTOM_UPLOAD" && (
+                <option value="CUSTOM_UPLOAD" className="bg-space-900">
+                  Custom Upload (Live Inference)
+                </option>
+              )}
             </select>
           </div>
 

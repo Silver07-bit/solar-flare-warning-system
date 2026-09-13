@@ -3,18 +3,26 @@ import { GlowingCard } from "./ui/glowing-card";
 import { fetchSolarChannels, type SolarChannelsResponse, type SolarChannel } from "../services/api";
 import { Layers, Compass, Eye, Sparkles } from "lucide-react";
 
-export const TabDiagnostics: React.FC<{ scenario: string }> = ({ scenario }) => {
+export const TabDiagnostics: React.FC<{
+  scenario: string;
+  customChannels?: SolarChannelsResponse | null;
+}> = ({ scenario, customChannels }) => {
   const [data, setData] = useState<SolarChannelsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("ch0");
 
   useEffect(() => {
+    if (scenario === "CUSTOM_UPLOAD" && customChannels) {
+      setData(customChannels);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetchSolarChannels(scenario)
       .then((res: SolarChannelsResponse) => setData(res))
       .catch((err: unknown) => console.error(err))
       .finally(() => setLoading(false));
-  }, [scenario]);
+  }, [scenario, customChannels]);
 
   if (loading || !data) {
     return (
